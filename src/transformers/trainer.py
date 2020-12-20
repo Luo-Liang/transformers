@@ -20,13 +20,17 @@ import collections
 import inspect
 import math
 import os
+if "INSTRUMENT" in os.environ:
+    instrument = int(os.environ["INSTRUMENT"])
+else:
+    instrument = 0
 import re
 import shutil
 import time
 import warnings
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
+from torchsummary import summary_string_huggingface
 
 # Integrations must be imported before ML frameworks:
 from .integrations import (  # isort: split
@@ -1163,6 +1167,13 @@ class Trainer:
 
         Subclass and override for custom behavior.
         """
+        if instrument > 0:
+            fw,bw,parameters,ts = summary_string_huggingface(model, inputs, iter=instrument)
+            print(f"fw: {fw}")
+            print(f"bw: {bw}")
+            print(f"ps: {parameters}")
+            print(f"ts: {ts}")
+            exit()
         outputs = model(**inputs)
         # Save past state if it exists
         # TODO: this needs to be fixed and made cleaner later.
