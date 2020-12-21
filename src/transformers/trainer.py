@@ -766,7 +766,9 @@ class Trainer:
                 # We just need to begin an iteration to create the randomization of the sampler.
                 for _ in train_dataloader:
                     break
-
+        start = time.perf_counter()
+        cnts = 0
+              
         for epoch in range(epochs_trained, num_train_epochs):
             if isinstance(train_dataloader, DataLoader) and isinstance(train_dataloader.sampler, DistributedSampler):
                 train_dataloader.sampler.set_epoch(epoch)
@@ -785,9 +787,11 @@ class Trainer:
 
             steps_in_epoch = len(epoch_iterator) if train_dataset_is_sized else self.args.max_steps
             self.control = self.callback_handler.on_epoch_begin(self.args, self.state, self.control)
-
             for step, inputs in enumerate(epoch_iterator):
-
+                if cnts >= 5:
+                    if cnts == 5:
+                        start = time.perf_counter()
+                cnts += 1
                 # Skip past any already trained steps if resuming training
                 if steps_trained_in_current_epoch > 0:
                     steps_trained_in_current_epoch -= 1
@@ -844,7 +848,7 @@ class Trainer:
 
                 if self.control.should_epoch_stop or self.control.should_training_stop:
                     break
-
+            
             self.control = self.callback_handler.on_epoch_end(self.args, self.state, self.control)
             self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
@@ -859,6 +863,8 @@ class Trainer:
                     )
             if self.control.should_training_stop:
                 break
+        end = time.perf_counter()
+        print(f"iteration latency = {(end-start) / (cnts-5)}. steps = {cnts-5}")
 
         if self.args.past_index and hasattr(self, "_past"):
             # Clean the state at the end of training
