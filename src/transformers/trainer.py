@@ -26,9 +26,9 @@ else:
     instrument = 0
 
 if "NO_BACKWARD" in os.environ:
-    no_backward = True
+    NO_BACKWARD = True
 else:
-    no_backward = False
+    NO_BACKWARD = False
 
 import re
 import shutil
