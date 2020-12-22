@@ -24,6 +24,12 @@ if "INSTRUMENT" in os.environ:
     instrument = int(os.environ["INSTRUMENT"])
 else:
     instrument = 0
+
+if "NO_BACKWARD" in os.environ:
+    no_backward = True
+else:
+    no_backward = False
+
 import re
 import shutil
 import time
@@ -1163,7 +1169,8 @@ class Trainer:
             with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                 scaled_loss.backward()
         else:
-            loss.backward()
+            if NO_BACKWARD is False:
+                loss.backward()
 
         return loss.detach()
 
