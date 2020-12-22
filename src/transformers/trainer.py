@@ -1149,7 +1149,7 @@ class Trainer:
             with autocast():
                 loss = self.compute_loss(model, inputs)
         else:
-            loss = self.compute_loss(model, inputs, self.optimizer)
+            loss = self.compute_loss(model, inputs, self.optimizer, self.args.max_grad_norm)
 
         if self.args.n_gpu > 1:
             loss = loss.mean()  # mean() to average on multi-gpu parallel training
@@ -1167,14 +1167,14 @@ class Trainer:
 
         return loss.detach()
 
-    def compute_loss(self, model, inputs, optimizer):
+    def compute_loss(self, model, inputs, optimizer, grad_norm):
         """
         How the loss is computed by Trainer. By default, all models return the loss in the first element.
 
         Subclass and override for custom behavior.
         """
         if instrument > 0:
-            fw,bw,parameters,ts = summary_string_huggingface(model, inputs, optimizer, iter=instrument)
+            fw,bw,parameters,ts = summary_string_huggingface(model, inputs, optimizer, grad_norm, iter=instrument)
             print(f"fw: {fw}")
             print(f"bw: {bw}")
             print(f"ps: {parameters}")
