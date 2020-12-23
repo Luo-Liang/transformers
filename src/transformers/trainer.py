@@ -830,10 +830,11 @@ class Trainer:
                             self.optimizer.clip_grad_norm(self.args.max_grad_norm)
                         else:
                             # Revert to normal clipping otherwise, handling Apex or full precision
-                            torch.nn.utils.clip_grad_norm_(
-                                amp.master_params(self.optimizer) if self.use_apex else model.parameters(),
-                                self.args.max_grad_norm,
-                            )
+                            if NO_BACKWARD is False:
+                                torch.nn.utils.clip_grad_norm_(
+                                    amp.master_params(self.optimizer) if self.use_apex else model.parameters(),
+                                    self.args.max_grad_norm,
+                                )
 
                     # Optimizer step
                     if is_torch_tpu_available():
@@ -856,7 +857,7 @@ class Trainer:
                     break
             
             self.control = self.callback_handler.on_epoch_end(self.args, self.state, self.control)
-            self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
+            # self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
             if self.args.tpu_metrics_debug or self.args.debug:
                 if is_torch_tpu_available():
