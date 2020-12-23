@@ -691,6 +691,8 @@ class Trainer:
                     else True
                 ),
             )
+            print("WARNING: using DDP. instrumentation must be off.")
+            assert NO_BACKWARD is False and instrument == 0
             # find_unused_parameters breaks checkpointing as per
             # https://github.com/huggingface/transformers/pull/4659#issuecomment-643356021
 
