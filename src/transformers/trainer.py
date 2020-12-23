@@ -796,8 +796,8 @@ class Trainer:
             steps_in_epoch = len(epoch_iterator) if train_dataset_is_sized else self.args.max_steps
             self.control = self.callback_handler.on_epoch_begin(self.args, self.state, self.control)
             for step, inputs in enumerate(epoch_iterator):
-                if cnts >= 5:
-                    if cnts == 5:
+                if cnts >= 10:
+                    if cnts == 10:
                         start = time.perf_counter()
                 cnts += 1
                 # Skip past any already trained steps if resuming training
@@ -873,7 +873,7 @@ class Trainer:
             if self.control.should_training_stop:
                 break
         end = time.perf_counter()
-        print(f"iteration latency = {(end-start) / (cnts-5)}. steps = {cnts-5}")
+        print(f"iteration latency = {(end-start) / (cnts-10)}. steps = {cnts-10}")
 
         if self.args.past_index and hasattr(self, "_past"):
             # Clean the state at the end of training
