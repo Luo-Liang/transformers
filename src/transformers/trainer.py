@@ -630,6 +630,8 @@ class Trainer:
 
             if not self.args.model_parallel:
                 self.model = model.to(self.args.device)
+            else:
+                assert False, "model parallelism is disabled"
 
             # Reinitializes optimizer and scheduler
             self.optimizer, self.lr_scheduler = None, None
@@ -692,7 +694,7 @@ class Trainer:
                 ),
             )
             print("WARNING: using DDP. instrumentation must be off.")
-            assert NO_BACKWARD is False and instrument == 0
+            assert NO_BACKWARD is False and instrument == 0 and self.args.model_parallel == False
             # find_unused_parameters breaks checkpointing as per
             # https://github.com/huggingface/transformers/pull/4659#issuecomment-643356021
 
