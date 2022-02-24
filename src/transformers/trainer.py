@@ -170,7 +170,6 @@ if is_fairscale_available():
 
 logger = logging.get_logger(__name__)
 
-
 class Trainer:
     """
     Trainer is a simple but feature-complete training and eval loop for PyTorch, optimized for 🤗 Transformers.
@@ -690,9 +689,10 @@ class Trainer:
                     if isinstance(model, PreTrainedModel)
                     else True
                 ),
+                broadcast_buffers=False
             )
-            print("WARNING: using DDP. instrumentation must be off.")
-            assert NO_BACKWARD is False and instrument == 0
+            # print("WARNING: using DDP. instrumentation must be off.")
+            # assert NO_BACKWARD is False and instrument == 0
             # find_unused_parameters breaks checkpointing as per
             # https://github.com/huggingface/transformers/pull/4659#issuecomment-643356021
 
@@ -1184,6 +1184,7 @@ class Trainer:
         Subclass and override for custom behavior.
         """
         if instrument > 0:
+            print(type(model))
             fw,bw,parameters,ts = summary_string_huggingface(model, inputs, optimizer, grad_norm, iter=instrument)
             print(f"fw: {fw}")
             print(f"bw: {bw}")
