@@ -20,6 +20,8 @@ import collections
 import inspect
 import math
 import os
+import torch.distributed as dist
+
 if "INSTRUMENT" in os.environ:
     instrument = int(os.environ["INSTRUMENT"])
 else:
@@ -629,6 +631,8 @@ class Trainer:
 
             if not self.args.model_parallel:
                 self.model = model.to(self.args.device)
+            else:
+                assert False, "model parallelism is disabled"
 
             # Reinitializes optimizer and scheduler
             self.optimizer, self.lr_scheduler = None, None
@@ -873,7 +877,7 @@ class Trainer:
             if self.control.should_training_stop:
                 break
         end = time.perf_counter()
-        print(f"iteration latency = {(end-start) / (cnts-10)}. steps = {cnts-10}")
+        print(f"[{dist.get_rank()}/{dist.get_world_size()}] iteration latency = {(end-start) / (cnts-10)}. steps = {cnts-10}")
 
         if self.args.past_index and hasattr(self, "_past"):
             # Clean the state at the end of training
